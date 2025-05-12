@@ -1,0 +1,74 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:14
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: creditstar
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./infrastructure/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./data:/data  
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@creditstar.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+
+  minio:
+    image: minio/minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: admin
+      MINIO_ROOT_PASSWORD: password123
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio-data:/data
+
+  airflow:
+    build:
+      context: .
+      dockerfile: infrastructure/airflow/Dockerfile
+    environment:
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./scripts:/opt/airflow/scripts
+      - ./data:/opt/airflow/data 
+      - ./test:/opt/airflow/test                
+      - .env.docker:/opt/airflow/.env           
+    ports:
+      - "8080:8080"
+    command: >
+      bash -c "airflow db init &&
+               airflow users create --username admin --firstname admin --lastname admin --role Admin --email admin@example.com --password admin &&
+               airflow scheduler & airflow webserver"
+    depends_on:
+      - postgres
+      - minio
+
+  terraform:
+    image: hashicorp/terraform:1.6.6
+    working_dir: /workspace
+    volumes:
+      - ./terraform:/workspace
+    depends_on:
+      - minio
+    entrypoint: >
+      sh -c "terraform init &&
+             terraform apply -auto-approve"
+
+volumes:
+  pgdata:
+  minio-data:

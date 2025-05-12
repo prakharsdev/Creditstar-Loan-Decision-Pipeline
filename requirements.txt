@@ -1,0 +1,9 @@
+psycopg2-binary
+pandas
+boto3
+python-dotenv
+pyyaml
+pytest
+black
+flake8
+pre-commit
