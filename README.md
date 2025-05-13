@@ -3,7 +3,9 @@
 This repository contains a production-grade data pipeline developed for a technical assessment by Creditstar. The goal was to design a scalable, modular, and automated system that extracts data from a PostgreSQL database, transforms it into client-level features, applies rule-based loan decision logic, and stores the results in MinIO as a Parquet file. The solution emphasizes automation, clarity, and extensibility, mirroring patterns used in modern fintech data platforms.
 
 ---
-
+## Full Project Demo Video
+[![Demo Video](https://github.com/user-attachments/assets/2a8b7be1-d1a2-4149-90c4-fc4af6b4d924)](https://youtu.be/0MIHMGOn7oM)
+---
 ## Business Context
 
 The core objective of this project is to automate decision-making within the loan application process at Credistar. In a high-volume consumer finance environment, manually reviewing every application is neither scalable nor efficient. Therefore, building a data-driven system to assess the reliability of loan applicants helps optimize operational effort, reduce credit risk, and improve turnaround time.
